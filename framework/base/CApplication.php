@@ -158,15 +158,21 @@ abstract class CApplication extends CModule
 			unset($config['aliases']);
 		}
 
+		// Module 前置 init 框架默认为空
 		$this->preinit();
-
+		// 初始化异常操作函数
 		$this->initSystemHandlers();
+		// Yii 的组件 初始化 对应对象存储于 父CModule --> $_componentConfig 记住这里是 _componentConfig
 		$this->registerCoreComponents();
-
+        // 调用 CModule 的 configure() 方法 该方法用的是 CComponent 的 __set 进行设置 代码有点长... 还没看完具体内部功能
+        // 总的来说，根据 config key的类型，调用对应类型的方法，保存...
+        // https://blog.csdn.net/kxguan/article/details/24791009
 		$this->configure($config);
+        // 跟楼上 configure 类似
 		$this->attachBehaviors($this->behaviors);
+		// components...
 		$this->preloadComponents();
-
+        // 调用 CWebApplication 的 init
 		$this->init();
 	}
 
@@ -177,11 +183,13 @@ abstract class CApplication extends CModule
 	 * method to do more application-specific tasks.
 	 * Remember to call the parent implementation so that static application components are loaded.
 	 */
+	// 楼上 __construct 走完接下来就要 run() 了
 	public function run()
 	{
 		if($this->hasEventHandler('onBeginRequest'))
 			$this->onBeginRequest(new CEvent($this));
 		register_shutdown_function(array($this,'end'),0,false);
+		// 处理请求 获取对应 url 然后转发给对应的 Controller
 		$this->processRequest();
 		if($this->hasEventHandler('onEndRequest'))
 			$this->onEndRequest(new CEvent($this));

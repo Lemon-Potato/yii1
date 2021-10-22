@@ -542,6 +542,7 @@ class CWebApplication extends CApplication
 	{
 		parent::init();
 		// preload 'request' so that it has chance to respond to onBeginRequest event.
+        // 在这里创建了 CHttpRequest 对象
 		$this->getRequest();
 	}
 }
